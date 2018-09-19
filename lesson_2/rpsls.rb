@@ -2,6 +2,7 @@
 # William Clemens, Lesson 2
 # 2018-09-15
 
+GAME_WINNING_SCORE = 5
 WINNING_CHOICES = {
   'rock' =>     ['scissors', 'lizard'],
   'scissors' => ['paper', 'lizard'],
@@ -20,21 +21,15 @@ def win?(first, second)
   WINNING_CHOICES[first].include?(second)
 end
 
-def display_results(player, computer)
-  if win?(player, computer)
-    prompt("You won!")
-    return 1
-  elsif win?(computer, player)
-    prompt("Computer won!")
-    return 2
-  else
-    prompt("It's a tie!")
-  end
-end
-
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
+
+system("cls")
+prompt("Welcome to Rock-Paper-Scissors-Lizard-Spock!")
+prompt("You will play against the computer.")
+prompt("You win if you get to 5 points first!")
+prompt("Get ready....")
 
 player_score = 0
 computer_score = 0
@@ -43,7 +38,7 @@ loop do
   choice = ''
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
-    choice = Kernel.gets().chomp()
+    choice = Kernel.gets().chomp().downcase()
 
     case choice
     when 'r'
@@ -58,31 +53,28 @@ loop do
       choice = 'spock'
     end
 
-    if VALID_CHOICES.include?(choice)
-      break
-    else
-      prompt("That's not a valid choice.")
-    end
+    break if VALID_CHOICES.include?(choice)
+    prompt("That's not a valid choice.")
   end
 
   computer_choice = VALID_CHOICES.sample
 
   prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
 
-  winner = display_results(choice, computer_choice)
-
-  if winner == 1
+  if win?(choice, computer_choice)
+    prompt("You won!")
     player_score += 1
-  elsif winner == 2
+  elsif win?(computer_choice, choice)
+    prompt("Computer won!")
     computer_score += 1
+  else
+    prompt("It's a tie!")
   end
 
   display_current_score(player_score, computer_score)
 
-  # reset if score = 5
-
-  if player_score == 5 || computer_score == 5
-    if player_score == 5
+  if player_score == GAME_WINNING_SCORE || computer_score == GAME_WINNING_SCORE
+    if player_score == GAME_WINNING_SCORE
       prompt("You won the game, congratulations!")
     else
       prompt("The computer beat you!")
@@ -93,6 +85,7 @@ loop do
     break unless answer.downcase().start_with?('y')
     player_score = 0
     computer_score = 0
+    system("cls")
   end
 end
 
