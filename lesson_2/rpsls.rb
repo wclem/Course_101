@@ -25,11 +25,16 @@ def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
-system("cls")
-prompt("Welcome to Rock-Paper-Scissors-Lizard-Spock!")
-prompt("You will play against the computer.")
-prompt("You win if you get to 5 points first!")
-prompt("Get ready....")
+def display_welcome_message
+
+  system('clear') || system('cls')
+  prompt("Welcome to Rock-Paper-Scissors-Lizard-Spock!")
+  prompt("You will play against the computer.")
+  prompt("You win if you get to 5 points first!")
+  prompt("Get ready....")
+end
+
+display_welcome_message
 
 player_score = 0
 computer_score = 0
@@ -85,7 +90,7 @@ loop do
     break unless answer.downcase().start_with?('y')
     player_score = 0
     computer_score = 0
-    system("cls")
+    system('clear') || system('cls')
   end
 end
 
