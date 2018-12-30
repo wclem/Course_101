@@ -16,7 +16,7 @@ end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd)
-  #system 'clear'
+  system 'clear'
   system 'cls'
   puts "------------------------------------------------------"
   puts "You: #{PLAYER_MARKER}   Computer: #{COMPUTER_MARKER}"
@@ -46,14 +46,19 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def joinor(join_items, delim = ', ', conjunction = 'or')
+def joinor_long(join_items, delim, conjunction)
   out_string = ''
-  if join_items.length == 2 
-    out_string = join_items[0].to_s + EMPTY_SPACE + conjunction + EMPTY_SPACE + join_items[1].to_s
+  last_item = join_items.pop
+  join_items.each { |x| out_string << x.to_s + delim }
+  out_string + conjunction + EMPTY_SPACE + last_item.to_s
+end
+
+def joinor(join_items, delim = ', ', conjunction = 'or')
+  if join_items.length == 2
+    join_items[0].to_s + EMPTY_SPACE + conjunction + \
+      EMPTY_SPACE + join_items[1].to_s
   elsif join_items.length > 2
-    last_item = join_items.pop
-    join_items.each { |x| out_string << x.to_s + delim }
-    out_string << conjunction + EMPTY_SPACE + last_item.to_s
+    joinor_long(join_items, delim, conjunction)
   else
     join_items[0].to_s
   end
@@ -74,19 +79,16 @@ def computer_places_piece!(brd)
   opportunity_move = detect_opportunity(brd)
   threat_move = detect_threat(brd)
   if !opportunity_move.nil?
-    prompt "Computer: Offensive move!"
+    # prompt "Computer: Offensive move!"
     brd[opportunity_move] = COMPUTER_MARKER
-    return
   elsif !threat_move.nil?
-    prompt "Computer: Defensive move!"
+    # prompt "Computer: Defensive move!"
     brd[threat_move] = COMPUTER_MARKER
-    return
   elsif brd[5] == INITIAL_MARKER
-    prompt "Computer: Take 5"
+    # prompt "Computer: Take 5"
     brd[5] = COMPUTER_MARKER
-    return 
   else
-    prompt "Computer: Random move!"
+    # prompt "Computer: Random move!"
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
   end
@@ -123,7 +125,8 @@ def detect_threat(brd) # This is the Defensive AI
       end
     end
   end
-  nil # Return nil instead of the entire WINNING_LINES array, to show no defensive move found
+  nil # Return nil instead of the entire WINNING_LINES array,
+  # to show no defensive move found
 end
 
 def detect_opportunity(brd) # This is the Offensive AI
@@ -138,7 +141,8 @@ def detect_opportunity(brd) # This is the Offensive AI
       end
     end
   end
-  nil # Return nil instead of the entire WINNING_LINES array, to show no opportunity move found
+  nil # Return nil instead of the entire WINNING_LINES array,
+  # to show no opportunity move found
 end
 
 def choose_player
@@ -167,24 +171,25 @@ def alternate_player(current_player)
   end
 end
 
-
 # Player/Computer score variables
 player_score = 0
 computer_score = 0
 
 # Set who goes first
-if GO_FIRST == 'choose'
-  current_player = choose_player
-elsif GO_FIRST == 'player'
-  current_player = 'player'
-else
-  current_player = 'computer'
-end
+starting_player =   case GO_FIRST
+                    when 'choose'
+                      choose_player
+                    when 'player'
+                      'player'
+                    else
+                      'computer'
+                    end
 
 # Start game loop
 loop do
   board = initialize_board
-  
+  current_player = starting_player
+
   loop do
     display_board(board)
     place_piece!(board, current_player)
@@ -196,7 +201,7 @@ loop do
   # Publish scores
   puts "Player: #{player_score}"
   puts "Computer: #{computer_score}"
-  
+
   if someone_won?(board)
     prompt "#{detect_winner(board)} won!"
   else
