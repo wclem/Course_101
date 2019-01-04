@@ -15,7 +15,7 @@ def prompt(msg)
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-def display_board(brd)
+def display_board(brd, player_score, computer_score)
   system 'clear'
   system 'cls'
   puts "------------------------------------------------------"
@@ -33,6 +33,7 @@ def display_board(brd)
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
   puts "     |     |"
   puts ""
+  puts "Player: #{player_score}    Computer: #{computer_score}"
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
@@ -46,21 +47,26 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def joinor_long(join_items, delim, conjunction)
-  out_string = ''
-  last_item = join_items.pop
-  join_items.each { |x| out_string << x.to_s + delim }
-  out_string + conjunction + EMPTY_SPACE + last_item.to_s
+def conj_list(tail_item, conjunction)
+  conjunction + ' ' + tail_item.to_s
+end
+
+def delim_list(join_items, delim)
+  joined_items = ''
+  join_items.each do |item|
+    joined_items << item.to_s
+    joined_items << delim
+  end
+  joined_items
 end
 
 def joinor(join_items, delim = ', ', conjunction = 'or')
-  if join_items.length == 2
-    join_items[0].to_s + EMPTY_SPACE + conjunction + \
-      EMPTY_SPACE + join_items[1].to_s
-  elsif join_items.length > 2
-    joinor_long(join_items, delim, conjunction)
+  if join_items.count == 2
+    tail_item = join_items.pop
+    join_items[0].to_s + ' ' + conj_list(tail_item, conjunction)
   else
-    join_items[0].to_s
+    tail_item = join_items.pop
+    delim_list(join_items, delim) + conj_list(tail_item, conjunction)
   end
 end
 
@@ -79,16 +85,12 @@ def computer_places_piece!(brd)
   opportunity_move = detect_opportunity(brd)
   threat_move = detect_threat(brd)
   if !opportunity_move.nil?
-    # prompt "Computer: Offensive move!"
     brd[opportunity_move] = COMPUTER_MARKER
   elsif !threat_move.nil?
-    # prompt "Computer: Defensive move!"
     brd[threat_move] = COMPUTER_MARKER
   elsif brd[5] == INITIAL_MARKER
-    # prompt "Computer: Take 5"
     brd[5] = COMPUTER_MARKER
   else
-    # prompt "Computer: Random move!"
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
   end
@@ -146,7 +148,7 @@ def detect_opportunity(brd) # This is the Offensive AI
 end
 
 def choose_player
-  puts "Who goes first? (P/C)"
+  puts "Who goes first? Enter 'p' for player, or 'c' for computer."
   if gets.chomp.downcase.start_with?('p')
     'player'
   else
@@ -159,7 +161,7 @@ def place_piece!(brd, player)
     player_places_piece!(brd)
   else
     computer_places_piece!(brd)
-    sleep(3)
+    sleep(2)
   end
 end
 
@@ -191,17 +193,13 @@ loop do
   current_player = starting_player
 
   loop do
-    display_board(board)
+    display_board(board, player_score, computer_score)
     place_piece!(board, current_player)
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 
-  display_board(board)
-  # Publish scores
-  puts "Player: #{player_score}"
-  puts "Computer: #{computer_score}"
-
+  display_board(board, player_score, computer_score)
   if someone_won?(board)
     prompt "#{detect_winner(board)} won!"
   else
@@ -218,7 +216,7 @@ loop do
   elsif computer_score == 5
     puts "Computer wins the tournament!"
   end
-  sleep(3)
+  sleep(2)
 
   if player_score == 5 || computer_score == 5
     player_score = 0
