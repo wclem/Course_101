@@ -79,16 +79,15 @@ end
 def show_multiple_cards(hand)
   cardcount = hand.count
   msg = ''
-  hand.each.with_index {|card, index|  
+  hand.each.with_index do |card, index|
     msg += get_card_name(card[1]).to_s
     if index == cardcount - 2
       msg += ", and "
     elsif index < cardcount - 2
       msg += ", "
     end
-  }
+  end
   msg
-
 end
 
 def show_player_cards(hand)
