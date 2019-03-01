@@ -6,10 +6,17 @@ TARGET_SCORE = 21
 STAY_SCORE = 17
 
 def welcome_message
+  clear_terminal
   puts "Welcome to Twenty-One!"
   puts "You can hit or stay, but don't go over 21!"
   puts "Press return to hit, and 's' to stay."
-  puts "It's your turn..."
+  puts "It's your turn, press any key to start."
+  gets.chomp
+  clear_terminal
+end
+
+def clear_terminal
+  system('clear') || system('cls')
 end
 
 def initialize_deck
@@ -72,15 +79,16 @@ end
 def show_multiple_cards(hand)
   cardcount = hand.count
   msg = ''
-  for i in 0..cardcount - 1
-    msg += get_card_name(hand[i][1]).to_s
-    if i == cardcount - 2
+  hand.each.with_index {|card, index|  
+    msg += get_card_name(card[1]).to_s
+    if index == cardcount - 2
       msg += ", and "
-    elsif i < cardcount - 2
+    elsif index < cardcount - 2
       msg += ", "
     end
-  end
+  }
   msg
+
 end
 
 def show_player_cards(hand)
@@ -201,8 +209,7 @@ loop do
 
   break if player_competition_score >= 5 || dealer_competition_score >= 5
   break unless play_again?
-  system 'clear'
-  system 'cls'
+  clear_terminal
 end
 
 puts "Player got #{player_competition_score} points."
